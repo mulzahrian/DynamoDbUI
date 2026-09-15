@@ -55,6 +55,7 @@ D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\System.Text.Encodings.Web.xml
 D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\System.Text.Json.xml
 D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\System.Threading.Tasks.Extensions.xml
 D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\System.ValueTuple.xml
+D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.csprojAssemblyReference.cache
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.Properties.Resources.resources
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.csproj.GenerateResource.cache
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.csproj.CoreCompileInputs.cache

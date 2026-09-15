@@ -80,6 +80,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\QueryEditorPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\QueryEditorPanel.Designer.cs">
+      <DependentUpon>QueryEditorPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,6 +110,10 @@
     <Compile Include="Utils\AttributeValueConverter.cs" />
     <Compile Include="Utils\ConnectionStore.cs" />
     <Compile Include="Utils\CsvLineParser.cs" />
+    <Compile Include="Utils\DarkPurpleColorTable.cs" />
+    <Compile Include="Utils\DarkTheme.cs" />
+    <Compile Include="Utils\NativeMethods.cs" />
+    <Compile Include="Utils\QuerySyntaxHighlighter.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

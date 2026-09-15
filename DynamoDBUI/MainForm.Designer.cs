@@ -29,17 +29,7 @@
 
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.tvConnections = new System.Windows.Forms.TreeView();
-
-            this.splitContent = new System.Windows.Forms.SplitContainer();
-            this.pnlEditorTop = new System.Windows.Forms.Panel();
-            this.lblEditor = new System.Windows.Forms.Label();
-            this.btnRunQuery = new System.Windows.Forms.Button();
-            this.txtEditor = new System.Windows.Forms.TextBox();
-
-            this.pnlResultsTop = new System.Windows.Forms.Panel();
-            this.lblResults = new System.Windows.Forms.Label();
-            this.dgvResults = new System.Windows.Forms.DataGridView();
-            this.lblMessage = new System.Windows.Forms.Label();
+            this.tabQueries = new System.Windows.Forms.TabControl();
 
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -47,13 +37,6 @@
             this.splitMain.Panel1.SuspendLayout();
             this.splitMain.Panel2.SuspendLayout();
             this.splitMain.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContent)).BeginInit();
-            this.splitContent.Panel1.SuspendLayout();
-            this.splitContent.Panel2.SuspendLayout();
-            this.splitContent.SuspendLayout();
-            this.pnlEditorTop.SuspendLayout();
-            this.pnlResultsTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).BeginInit();
             this.SuspendLayout();
 
             // menuStrip
@@ -61,7 +44,6 @@
                 this.mnuFile, this.mnuDatabase, this.mnuWindow, this.mnuHelp });
             this.menuStrip.Dock = System.Windows.Forms.DockStyle.Top;
 
-            // File
             this.mnuFile.Text = "File";
             this.mnuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.mnuFileNewQuery, this.mnuFileExit });
@@ -70,7 +52,6 @@
             this.mnuFileExit.Text = "Exit";
             this.mnuFileExit.Click += new System.EventHandler(this.mnuFileExit_Click);
 
-            // Database
             this.mnuDatabase.Text = "Database";
             this.mnuDatabase.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.mnuDatabaseAddConnection, this.mnuDatabaseRefreshTables });
@@ -79,14 +60,12 @@
             this.mnuDatabaseRefreshTables.Text = "Refresh Tables";
             this.mnuDatabaseRefreshTables.Click += new System.EventHandler(this.mnuDatabaseRefreshTables_Click);
 
-            // Window
             this.mnuWindow.Text = "Window";
             this.mnuWindow.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.mnuWindowToggleSidebar });
             this.mnuWindowToggleSidebar.Text = "Toggle Sidebar";
             this.mnuWindowToggleSidebar.Click += new System.EventHandler(this.mnuWindowToggleSidebar_Click);
 
-            // Help
             this.mnuHelp.Text = "Help";
             this.mnuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.mnuHelpAbout });
@@ -98,72 +77,26 @@
             this.statusStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tsslConnection.Text = "Tidak ada connection aktif";
 
-            // splitMain (sidebar | content)
+            // splitMain (sidebar lebih lebar | tab queries)
             this.splitMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitMain.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.splitMain.SplitterDistance = 220;
+            this.splitMain.SplitterDistance = 300;
             this.splitMain.Panel1.Controls.Add(this.tvConnections);
-            this.splitMain.Panel2.Controls.Add(this.splitContent);
+            this.splitMain.Panel2.Controls.Add(this.tabQueries);
 
             // tvConnections
             this.tvConnections.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvConnections.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tvConnections.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.tvConnections.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvConnections_AfterSelect);
             this.tvConnections.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvConnections_NodeMouseDoubleClick);
 
-            // splitContent (editor / results)
-            this.splitContent.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContent.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.splitContent.SplitterDistance = 180;
-            this.splitContent.Panel1.Controls.Add(this.txtEditor);
-            this.splitContent.Panel1.Controls.Add(this.pnlEditorTop);
-            this.splitContent.Panel2.Controls.Add(this.dgvResults);
-            this.splitContent.Panel2.Controls.Add(this.lblMessage);
-            this.splitContent.Panel2.Controls.Add(this.pnlResultsTop);
-
-            // pnlEditorTop
-            this.pnlEditorTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlEditorTop.Height = 35;
-            this.pnlEditorTop.Controls.Add(this.lblEditor);
-            this.pnlEditorTop.Controls.Add(this.btnRunQuery);
-
-            this.lblEditor.Text = "Query Editor  (F5 = Run)";
-            this.lblEditor.Location = new System.Drawing.Point(8, 10);
-            this.lblEditor.Size = new System.Drawing.Size(250, 20);
-
-            this.btnRunQuery.Text = "\u25B6 Run";
-            this.btnRunQuery.Location = new System.Drawing.Point(460, 3);
-            this.btnRunQuery.Size = new System.Drawing.Size(100, 28);
-            this.btnRunQuery.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            this.btnRunQuery.Click += new System.EventHandler(this.btnRunQuery_Click);
-
-            // txtEditor
-            this.txtEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtEditor.Multiline = true;
-            this.txtEditor.Font = new System.Drawing.Font("Consolas", 11F);
-            this.txtEditor.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtEditor.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtEditor_KeyDown);
-
-            // pnlResultsTop
-            this.pnlResultsTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlResultsTop.Height = 25;
-            this.pnlResultsTop.Controls.Add(this.lblResults);
-            this.lblResults.Text = "Results";
-            this.lblResults.Location = new System.Drawing.Point(8, 5);
-            this.lblResults.Size = new System.Drawing.Size(200, 20);
-
-            // dgvResults
-            this.dgvResults.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvResults.AllowUserToAddRows = false;
-            this.dgvResults.ReadOnly = true;
-
-            // lblMessage
-            this.lblMessage.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lblMessage.Height = 22;
-            this.lblMessage.Text = "";
-            this.lblMessage.ForeColor = System.Drawing.Color.DimGray;
+            // tabQueries
+            this.tabQueries.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabQueries.Font = new System.Drawing.Font("Segoe UI", 9.5F);
 
             // MainForm
-            this.ClientSize = new System.Drawing.Size(1000, 650);
+            this.ClientSize = new System.Drawing.Size(1100, 680);
             this.Controls.Add(this.splitMain);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
@@ -178,14 +111,6 @@
             this.splitMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).EndInit();
             this.splitMain.ResumeLayout(false);
-            this.splitContent.Panel1.ResumeLayout(false);
-            this.splitContent.Panel1.PerformLayout();
-            this.splitContent.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContent)).EndInit();
-            this.splitContent.ResumeLayout(false);
-            this.pnlEditorTop.ResumeLayout(false);
-            this.pnlResultsTop.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -207,16 +132,6 @@
 
         private System.Windows.Forms.SplitContainer splitMain;
         private System.Windows.Forms.TreeView tvConnections;
-
-        private System.Windows.Forms.SplitContainer splitContent;
-        private System.Windows.Forms.Panel pnlEditorTop;
-        private System.Windows.Forms.Label lblEditor;
-        private System.Windows.Forms.Button btnRunQuery;
-        private System.Windows.Forms.TextBox txtEditor;
-
-        private System.Windows.Forms.Panel pnlResultsTop;
-        private System.Windows.Forms.Label lblResults;
-        private System.Windows.Forms.DataGridView dgvResults;
-        private System.Windows.Forms.Label lblMessage;
+        private System.Windows.Forms.TabControl tabQueries;
     }
 }
