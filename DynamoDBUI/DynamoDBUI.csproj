@@ -80,14 +80,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\AddConnectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddConnectionForm.Designer.cs">
+      <DependentUpon>AddConnectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ConnectionProfile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryEngine\ParsedQuery.cs" />
+    <Compile Include="QueryEngine\QueryExecutor.cs" />
+    <Compile Include="QueryEngine\QueryParseException.cs" />
+    <Compile Include="QueryEngine\QueryParser.cs" />
+    <Compile Include="Services\ConnectionManager.cs" />
+    <Compile Include="Services\DynamoDbService.cs" />
+    <Compile Include="Utils\AttributeValueConverter.cs" />
+    <Compile Include="Utils\ConnectionStore.cs" />
+    <Compile Include="Utils\CsvLineParser.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -115,5 +131,6 @@
     <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.4.0.103.7\analyzers\dotnet\cs\AWSSDK.DynamoDBv2.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.4.0.103.7\analyzers\dotnet\cs\SharedAnalysisCode.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
