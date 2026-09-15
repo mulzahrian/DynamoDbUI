@@ -77,10 +77,14 @@
             this.statusStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tsslConnection.Text = "Tidak ada connection aktif";
 
-            // splitMain (sidebar lebih lebar | tab queries)
+            // splitMain (sidebar lebih kecil | query editor lebih besar/fokus)
             this.splitMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitMain.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.splitMain.SplitterDistance = 300;
+            this.splitMain.Size = new System.Drawing.Size(1100, 634);
+            this.splitMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitMain.Panel1MinSize = 160;
+            this.splitMain.Panel2MinSize = 300;
+            this.splitMain.SplitterDistance = 220;
             this.splitMain.Panel1.Controls.Add(this.tvConnections);
             this.splitMain.Panel2.Controls.Add(this.tabQueries);
 

@@ -62,3 +62,4 @@ D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.csproj.CoreCompileInputs.
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.csproj.CopyComplete
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.exe
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.pdb
+D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\src\dynamo.ico
