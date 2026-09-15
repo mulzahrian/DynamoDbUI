@@ -21,12 +21,29 @@ namespace DynamoDBUI
         public MainForm()
         {
             InitializeComponent();
+            LoadIcon();
             ApplyDarkTheme();
             LoadConnectionsIntoSidebar();
             SetupTabs();
         }
 
         // ============ THEME ============
+
+        private void LoadIcon()
+        {
+            try
+            {
+                string iconPath = System.IO.Path.Combine(Application.StartupPath, "src", "dynamo.ico");
+                if (System.IO.File.Exists(iconPath))
+                {
+                    this.Icon = new System.Drawing.Icon(iconPath);
+                }
+            }
+            catch
+            {
+                // Kalau file icon tidak ketemu/corrupt, biarkan pakai icon default. Tidak perlu crash aplikasi.
+            }
+        }
 
         private void ApplyDarkTheme()
         {
@@ -78,6 +95,9 @@ namespace DynamoDBUI
 
         private void tabQueries_DrawItem(object sender, DrawItemEventArgs e)
         {
+            if (e.Index < 0 || e.Index >= tabQueries.TabCount)
+                return;
+
             var tabPage = tabQueries.TabPages[e.Index];
             var bounds = tabQueries.GetTabRect(e.Index);
             bool selected = e.Index == tabQueries.SelectedIndex;
