@@ -118,6 +118,46 @@ namespace DynamoDBUI.Services
             });
         }
 
+        /// <summary>
+        /// Ambil daftar nama kolom untuk ditampilkan di sidebar: kolom key schema (PK/SK)
+        /// digabung dengan atribut lain yang terdeteksi dari satu contoh item (kalau ada).
+        /// DynamoDB schemaless di luar key, jadi ini best-effort saja.
+        /// </summary>
+        public async Task<List<string>> GetColumnsAsync(string tableName)
+        {
+            EnsureConnected();
+
+            var columns = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var describe = await _client.DescribeTableAsync(new DescribeTableRequest { TableName = tableName });
+            foreach (var key in describe.Table.KeySchema)
+            {
+                string label = key.KeyType == KeyType.HASH ? $"{key.AttributeName} (PK)" : $"{key.AttributeName} (SK)";
+                columns.Add(label);
+                seen.Add(key.AttributeName);
+            }
+
+            try
+            {
+                var scan = await _client.ScanAsync(new ScanRequest { TableName = tableName, Limit = 1 });
+                if (scan.Items.Count > 0)
+                {
+                    foreach (var attributeName in scan.Items[0].Keys)
+                    {
+                        if (seen.Add(attributeName))
+                            columns.Add(attributeName);
+                    }
+                }
+            }
+            catch
+            {
+                // Kalau scan gagal (misal permission terbatas), cukup tampilkan kolom dari key schema.
+            }
+
+            return columns;
+        }
+
         private void EnsureConnected()
         {
             if (_client == null)

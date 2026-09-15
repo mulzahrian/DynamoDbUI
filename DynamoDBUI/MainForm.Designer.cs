@@ -31,6 +31,12 @@
             this.tvConnections = new System.Windows.Forms.TreeView();
             this.tabQueries = new System.Windows.Forms.TabControl();
 
+            this.ctxConnections = new System.Windows.Forms.ContextMenuStrip();
+            this.mnuCtxRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuCtxDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuCtxSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuCtxRefresh = new System.Windows.Forms.ToolStripMenuItem();
+
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
@@ -92,8 +98,21 @@
             this.tvConnections.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvConnections.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tvConnections.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.tvConnections.ContextMenuStrip = this.ctxConnections;
             this.tvConnections.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvConnections_AfterSelect);
             this.tvConnections.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvConnections_NodeMouseDoubleClick);
+            this.tvConnections.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvConnections_BeforeExpand);
+
+            // ctxConnections (rename/delete connection)
+            this.ctxConnections.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.mnuCtxRename, this.mnuCtxDelete, this.mnuCtxSeparator, this.mnuCtxRefresh });
+            this.ctxConnections.Opening += new System.ComponentModel.CancelEventHandler(this.ctxConnections_Opening);
+            this.mnuCtxRename.Text = "Rename Connection...";
+            this.mnuCtxRename.Click += new System.EventHandler(this.mnuCtxRename_Click);
+            this.mnuCtxDelete.Text = "Delete Connection";
+            this.mnuCtxDelete.Click += new System.EventHandler(this.mnuCtxDelete_Click);
+            this.mnuCtxRefresh.Text = "Refresh Tables";
+            this.mnuCtxRefresh.Click += new System.EventHandler(this.mnuDatabaseRefreshTables_Click);
 
             // tabQueries
             this.tabQueries.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -137,5 +156,11 @@
         private System.Windows.Forms.SplitContainer splitMain;
         private System.Windows.Forms.TreeView tvConnections;
         private System.Windows.Forms.TabControl tabQueries;
+
+        private System.Windows.Forms.ContextMenuStrip ctxConnections;
+        private System.Windows.Forms.ToolStripMenuItem mnuCtxRename;
+        private System.Windows.Forms.ToolStripMenuItem mnuCtxDelete;
+        private System.Windows.Forms.ToolStripSeparator mnuCtxSeparator;
+        private System.Windows.Forms.ToolStripMenuItem mnuCtxRefresh;
     }
 }

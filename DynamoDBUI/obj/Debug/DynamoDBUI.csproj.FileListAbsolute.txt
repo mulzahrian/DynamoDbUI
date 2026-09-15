@@ -63,3 +63,6 @@ D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.csproj.CopyComplete
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.exe
 D:\Learning\DynamoDbUI\DynamoDBUI\obj\Debug\DynamoDBUI.pdb
 D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\src\dynamo.ico
+D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\src\DynamoDB.png
+D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\src\table.png
+D:\Learning\DynamoDbUI\DynamoDBUI\bin\Debug\src\column.png

@@ -15,6 +15,9 @@
             this.splitEditorResults = new System.Windows.Forms.SplitContainer();
             this.pnlToolbar = new System.Windows.Forms.Panel();
             this.btnRun = new System.Windows.Forms.Button();
+            this.btnCommit = new System.Windows.Forms.Button();
+            this.btnUndo = new System.Windows.Forms.Button();
+            this.toolTip = new System.Windows.Forms.ToolTip();
             this.lblEditorTitle = new System.Windows.Forms.Label();
             this.rtbEditor = new System.Windows.Forms.RichTextBox();
             this.pnlResultsHeader = new System.Windows.Forms.Panel();
@@ -45,6 +48,8 @@
             this.pnlToolbar.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlToolbar.Height = 40;
             this.pnlToolbar.Controls.Add(this.lblEditorTitle);
+            this.pnlToolbar.Controls.Add(this.btnUndo);
+            this.pnlToolbar.Controls.Add(this.btnCommit);
             this.pnlToolbar.Controls.Add(this.btnRun);
 
             this.lblEditorTitle.Text = "Query Editor";
@@ -52,13 +57,34 @@
             this.lblEditorTitle.Size = new System.Drawing.Size(200, 20);
             this.lblEditorTitle.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
 
-            this.btnRun.Text = "\u25B6 Run Query (F5)";
-            this.btnRun.Size = new System.Drawing.Size(150, 28);
-            this.btnRun.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            // Tiga tombol icon-only: Undo | Commit | Run, posisi dihitung ulang di code-behind
+            // (lihat PositionToolbarButtons) supaya selalu nempel rapi di kanan toolbar berapa pun lebarnya.
+            this.btnRun.Text = "";
+            this.btnRun.Size = new System.Drawing.Size(32, 30);
             this.btnRun.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRun.FlatAppearance.BorderSize = 0;
             this.btnRun.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnRun.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnRun.TabStop = false;
+            this.toolTip.SetToolTip(this.btnRun, "Run Query (F5)");
+            this.btnRun.Paint += new System.Windows.Forms.PaintEventHandler(this.btnRun_Paint);
+
+            this.btnCommit.Text = "";
+            this.btnCommit.Size = new System.Drawing.Size(32, 30);
+            this.btnCommit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCommit.FlatAppearance.BorderSize = 0;
+            this.btnCommit.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCommit.TabStop = false;
+            this.toolTip.SetToolTip(this.btnCommit, "Commit (jalankan perubahan)");
+            this.btnCommit.Paint += new System.Windows.Forms.PaintEventHandler(this.btnCommit_Paint);
+
+            this.btnUndo.Text = "";
+            this.btnUndo.Size = new System.Drawing.Size(32, 30);
+            this.btnUndo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUndo.FlatAppearance.BorderSize = 0;
+            this.btnUndo.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnUndo.TabStop = false;
+            this.toolTip.SetToolTip(this.btnUndo, "Un Commit (undo, Ctrl+Z)");
+            this.btnUndo.Paint += new System.Windows.Forms.PaintEventHandler(this.btnUndo_Paint);
 
             // rtbEditor
             this.rtbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -114,6 +140,9 @@
         private System.Windows.Forms.SplitContainer splitEditorResults;
         private System.Windows.Forms.Panel pnlToolbar;
         private System.Windows.Forms.Button btnRun;
+        private System.Windows.Forms.Button btnCommit;
+        private System.Windows.Forms.Button btnUndo;
+        private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.Label lblEditorTitle;
         private System.Windows.Forms.RichTextBox rtbEditor;
         private System.Windows.Forms.Panel pnlResultsHeader;

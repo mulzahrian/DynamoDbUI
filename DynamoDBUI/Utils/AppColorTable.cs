@@ -3,10 +3,10 @@ using System.Windows.Forms;
 
 namespace DynamoDBUI.Utils
 {
-    public class DarkPurpleColorTable : ProfessionalColorTable
+    public class AppColorTable : ProfessionalColorTable
     {
-        private readonly Color _base = DarkTheme.HeaderPurple;
-        private readonly Color _hover = DarkTheme.HeaderPurpleLight;
+        private readonly Color _base = DarkTheme.PanelBackground;
+        private readonly Color _hover = DarkTheme.PanelHighlight;
 
         public override Color MenuStripGradientBegin => _base;
         public override Color MenuStripGradientEnd => _base;

@@ -15,13 +15,21 @@ namespace DynamoDBUI
         private readonly ConnectionManager _connectionManager = new ConnectionManager();
         private string _activeConnectionName;
 
-        private TabPage _tabPlus;
+        private Button _btnAddTab;
         private int _queryCounter = 1;
+
+        private ImageList _treeImages;
+        private const int IconConnection = 0;
+        private const int IconTable = 1;
+        private const int IconColumn = 2;
+
+        private Font _tabCloseFont;
 
         public MainForm()
         {
             InitializeComponent();
             LoadIcon();
+            LoadTreeIcons();
             ApplyDarkTheme();
             LoadConnectionsIntoSidebar();
             SetupTabs();
@@ -45,31 +53,70 @@ namespace DynamoDBUI
             }
         }
 
+        private void LoadTreeIcons()
+        {
+            _treeImages = new ImageList { ImageSize = new Size(16, 16), ColorDepth = ColorDepth.Depth32Bit };
+            _treeImages.Images.Add(LoadSidebarImage("DynamoDB.png"));
+            _treeImages.Images.Add(LoadSidebarImage("table.png"));
+            _treeImages.Images.Add(LoadSidebarImage("column.png"));
+            tvConnections.ImageList = _treeImages;
+        }
+
+        private Image LoadSidebarImage(string fileName)
+        {
+            var size = _treeImages.ImageSize;
+            try
+            {
+                string path = System.IO.Path.Combine(Application.StartupPath, "src", fileName);
+                if (System.IO.File.Exists(path))
+                {
+                    using (var original = Image.FromFile(path))
+                    {
+                        var resized = new Bitmap(size.Width, size.Height);
+                        using (var g = Graphics.FromImage(resized))
+                        {
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                            g.DrawImage(original, 0, 0, size.Width, size.Height);
+                        }
+                        return resized;
+                    }
+                }
+            }
+            catch
+            {
+                // Kalau file icon gagal dimuat, biarkan placeholder kosong; UI tetap jalan tanpa icon custom.
+            }
+            return new Bitmap(size.Width, size.Height);
+        }
+
         private void ApplyDarkTheme()
         {
             BackColor = DarkTheme.EditorBackground;
 
-            menuStrip.Renderer = new ToolStripProfessionalRenderer(new DarkPurpleColorTable());
-            menuStrip.BackColor = DarkTheme.HeaderPurple;
+            menuStrip.Renderer = new ToolStripProfessionalRenderer(new AppColorTable());
+            menuStrip.BackColor = DarkTheme.PanelBackground;
             foreach (ToolStripMenuItem item in menuStrip.Items)
                 SetMenuItemColors(item);
 
-            statusStrip.Renderer = new ToolStripProfessionalRenderer(new DarkPurpleColorTable());
-            statusStrip.BackColor = DarkTheme.HeaderPurple;
+            statusStrip.Renderer = new ToolStripProfessionalRenderer(new AppColorTable());
+            statusStrip.BackColor = DarkTheme.PanelBackground;
             tsslConnection.ForeColor = Color.Gainsboro;
 
-            tvConnections.BackColor = DarkTheme.HeaderPurple;
+            tvConnections.BackColor = DarkTheme.PanelBackground;
             tvConnections.ForeColor = Color.White;
             tvConnections.DrawMode = TreeViewDrawMode.OwnerDrawText;
             tvConnections.DrawNode += tvConnections_DrawNode;
 
             tabQueries.DrawMode = TabDrawMode.OwnerDrawFixed;
             tabQueries.SizeMode = TabSizeMode.Fixed;
-            tabQueries.ItemSize = new Size(110, 32);
-            tabQueries.Padding = new Point(12, 6);
+            tabQueries.ItemSize = new Size(130, 28);
+            tabQueries.Padding = new Point(10, 5);
+            _tabCloseFont = new Font("Segoe UI", 9F, FontStyle.Bold);
             tabQueries.DrawItem += tabQueries_DrawItem;
             tabQueries.Selecting += tabQueries_Selecting;
-            tabQueries.MouseDoubleClick += tabQueries_MouseDoubleClick;
+            tabQueries.MouseDown += tabQueries_MouseDown;
         }
 
         private void SetMenuItemColors(ToolStripMenuItem item)
@@ -82,7 +129,7 @@ namespace DynamoDBUI
         private void tvConnections_DrawNode(object sender, DrawTreeNodeEventArgs e)
         {
             bool selected = (e.State & TreeNodeStates.Selected) != 0;
-            var bg = selected ? DarkTheme.HeaderPurpleLight : DarkTheme.HeaderPurple;
+            var bg = selected ? DarkTheme.PanelHighlight : DarkTheme.PanelBackground;
 
             using (var brush = new SolidBrush(bg))
                 e.Graphics.FillRectangle(brush, e.Bounds);
@@ -102,21 +149,74 @@ namespace DynamoDBUI
             var bounds = tabQueries.GetTabRect(e.Index);
             bool selected = e.Index == tabQueries.SelectedIndex;
 
-            var bg = selected ? DarkTheme.AccentPurple : DarkTheme.HeaderPurple;
+            var bg = selected ? DarkTheme.AccentPrimary : DarkTheme.TabInactive;
             using (var brush = new SolidBrush(bg))
                 e.Graphics.FillRectangle(brush, bounds);
 
-            TextRenderer.DrawText(e.Graphics, tabPage.Text, tabQueries.Font, bounds,
-                Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            if (selected)
+            {
+                using (var accentBrush = new SolidBrush(DarkTheme.TabActiveAccent))
+                    e.Graphics.FillRectangle(accentBrush, bounds.Left, bounds.Bottom - 2, bounds.Width, 2);
+            }
+
+            var textRect = bounds;
+            textRect.Width -= CloseButtonSize + 8;
+
+            var textColor = selected ? Color.Black : Color.Gainsboro;
+            TextRenderer.DrawText(e.Graphics, tabPage.Text, tabQueries.Font, textRect, textColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+
+            var closeRect = GetTabCloseButtonRect(bounds);
+            TextRenderer.DrawText(e.Graphics, "\u00D7", _tabCloseFont, closeRect,
+                selected ? Color.Black : Color.Silver, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+        }
+
+        private const int CloseButtonSize = 16;
+
+        private static Rectangle GetTabCloseButtonRect(Rectangle tabBounds)
+        {
+            int x = tabBounds.Right - CloseButtonSize - 6;
+            int y = tabBounds.Top + (tabBounds.Height - CloseButtonSize) / 2;
+            return new Rectangle(x, y, CloseButtonSize, CloseButtonSize);
         }
 
         // ============ TABS ============
 
         private void SetupTabs()
         {
-            _tabPlus = new TabPage("+");
-            tabQueries.TabPages.Add(_tabPlus);
+            SetupAddTabButton();
             AddNewQueryTab();
+        }
+
+        private void SetupAddTabButton()
+        {
+            _btnAddTab = new Button
+            {
+                Text = "+",
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                ForeColor = DarkTheme.AccentPrimary,
+                BackColor = DarkTheme.TabInactive,
+                Size = new Size(30, tabQueries.ItemSize.Height),
+                Cursor = Cursors.Hand,
+                TabStop = false
+            };
+            _btnAddTab.FlatAppearance.BorderSize = 0;
+            _btnAddTab.FlatAppearance.MouseOverBackColor = DarkTheme.PanelHighlight;
+            _btnAddTab.Click += (s, e) => AddNewQueryTab();
+            // TabControl.Controls cuma nerima TabPage, jadi tombol "+" ditaruh sebagai sibling
+            // di splitMain.Panel2 lalu diposisikan manual supaya nempel di ujung kanan tab terakhir.
+            splitMain.Panel2.Controls.Add(_btnAddTab);
+            _btnAddTab.BringToFront();
+        }
+
+        private void RepositionAddTabButton()
+        {
+            if (_btnAddTab == null || tabQueries.TabCount == 0) return;
+            var lastRect = tabQueries.GetTabRect(tabQueries.TabCount - 1);
+            _btnAddTab.Size = new Size(30, lastRect.Height);
+            _btnAddTab.Location = new Point(lastRect.Right + 4, lastRect.Top);
+            _btnAddTab.BringToFront();
         }
 
         private QueryEditorPanel AddNewQueryTab()
@@ -126,6 +226,11 @@ namespace DynamoDBUI
             panel.Editor.Text = "VIEW TableName";
 
             panel.RunButton.Click += (s, e) => RunQuery(panel);
+            panel.CommitButton.Click += (s, e) => RunQuery(panel);
+            panel.UndoButton.Click += (s, e) =>
+            {
+                if (panel.Editor.CanUndo) panel.Editor.Undo();
+            };
             panel.Editor.KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.F5)
@@ -136,40 +241,45 @@ namespace DynamoDBUI
             };
 
             tabPage.Controls.Add(panel);
-            int insertIndex = tabQueries.TabPages.Count - 1; // sebelum tab "+"
-            tabQueries.TabPages.Insert(insertIndex, tabPage);
+            tabQueries.TabPages.Add(tabPage);
             tabQueries.SelectedTab = tabPage;
 
             QuerySyntaxHighlighter.Highlight(panel.Editor);
+            RepositionAddTabButton();
             return panel;
         }
 
         private void tabQueries_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            if (e.TabPage == _tabPlus)
+            // tab "+" sudah tidak lagi jadi TabPage, jadi tidak perlu di-cancel di sini.
+        }
+
+        private void tabQueries_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+
+            for (int i = 0; i < tabQueries.TabCount; i++)
             {
-                e.Cancel = true;
-                AddNewQueryTab();
+                var rect = tabQueries.GetTabRect(i);
+                if (GetTabCloseButtonRect(rect).Contains(e.Location))
+                {
+                    CloseQueryTab(i);
+                    return;
+                }
             }
         }
 
-        private void tabQueries_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void CloseQueryTab(int index)
         {
-            for (int i = 0; i < tabQueries.TabCount; i++)
+            // minimal harus ada 1 query tab yang terbuka
+            if (tabQueries.TabPages.Count <= 1)
             {
-                if (!tabQueries.GetTabRect(i).Contains(e.Location)) continue;
-                if (tabQueries.TabPages[i] == _tabPlus) return;
-
-                // minimal harus ada 1 tab query aktif selain tab "+"
-                if (tabQueries.TabPages.Count <= 2)
-                {
-                    MessageBox.Show("Minimal harus ada 1 query tab yang terbuka.");
-                    return;
-                }
-
-                tabQueries.TabPages.RemoveAt(i);
-                break;
+                MessageBox.Show("Minimal harus ada 1 query tab yang terbuka.");
+                return;
             }
+
+            tabQueries.TabPages.RemoveAt(index);
+            RepositionAddTabButton();
         }
 
         private QueryEditorPanel GetActivePanel()
@@ -184,9 +294,19 @@ namespace DynamoDBUI
             tvConnections.Nodes.Clear();
             foreach (var profile in _connectionManager.Profiles)
             {
-                var node = new TreeNode(profile.Name) { Tag = profile };
+                var node = CreateConnectionNode(profile);
                 tvConnections.Nodes.Add(node);
             }
+        }
+
+        private TreeNode CreateConnectionNode(ConnectionProfile profile)
+        {
+            return new TreeNode(profile.Name)
+            {
+                Tag = profile,
+                ImageIndex = IconConnection,
+                SelectedImageIndex = IconConnection
+            };
         }
 
         private async void RefreshTablesForNode(TreeNode connectionNode)
@@ -202,7 +322,7 @@ namespace DynamoDBUI
                 var tables = await service.ListTablesAsync();
 
                 foreach (var t in tables)
-                    connectionNode.Nodes.Add(new TreeNode(t) { Tag = "table" });
+                    connectionNode.Nodes.Add(CreateTableNode(t));
 
                 connectionNode.Expand();
                 SetStatus($"Terhubung: {profile.Name}", true);
@@ -214,10 +334,77 @@ namespace DynamoDBUI
             }
         }
 
-        private void tvConnections_AfterSelect(object sender, TreeViewEventArgs e)
+        private TreeNode CreateTableNode(string tableName)
+        {
+            var tableNode = new TreeNode(tableName)
+            {
+                Tag = "table",
+                ImageIndex = IconTable,
+                SelectedImageIndex = IconTable
+            };
+            // Placeholder supaya panah expand muncul; kolom baru di-load waktu user expand node ini.
+            tableNode.Nodes.Add(new TreeNode("Loading columns...") { Name = "placeholder" });
+            return tableNode;
+        }
+
+        private void tvConnections_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             var node = e.Node;
-            var connectionNode = node.Tag is ConnectionProfile ? node : node.Parent;
+            if (node.Tag as string == "table" &&
+                node.Nodes.Count == 1 &&
+                node.Nodes[0].Name == "placeholder")
+            {
+                LoadColumnsForNode(node);
+            }
+        }
+
+        private async void LoadColumnsForNode(TreeNode tableNode)
+        {
+            var connectionNode = FindAncestorConnectionNode(tableNode);
+            var profile = connectionNode?.Tag as ConnectionProfile;
+            if (profile == null) return;
+
+            try
+            {
+                var service = _connectionManager.GetService(profile.Name);
+                var columns = await service.GetColumnsAsync(tableNode.Text);
+
+                tableNode.Nodes.Clear();
+                if (columns.Count == 0)
+                {
+                    tableNode.Nodes.Add(new TreeNode("(tidak ada kolom terdeteksi)"));
+                }
+                else
+                {
+                    foreach (var column in columns)
+                    {
+                        tableNode.Nodes.Add(new TreeNode(column)
+                        {
+                            Tag = "column",
+                            ImageIndex = IconColumn,
+                            SelectedImageIndex = IconColumn
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                tableNode.Nodes.Clear();
+                tableNode.Nodes.Add(new TreeNode("(gagal load columns: " + ex.Message + ")"));
+            }
+        }
+
+        private static TreeNode FindAncestorConnectionNode(TreeNode node)
+        {
+            var current = node;
+            while (current != null && !(current.Tag is ConnectionProfile))
+                current = current.Parent;
+            return current;
+        }
+
+        private void tvConnections_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            var connectionNode = FindAncestorConnectionNode(e.Node);
             if (connectionNode?.Tag is ConnectionProfile profile)
             {
                 _activeConnectionName = profile.Name;
@@ -242,6 +429,73 @@ namespace DynamoDBUI
             }
         }
 
+        // ============ SIDEBAR CONTEXT MENU (rename/delete connection) ============
+
+        private void ctxConnections_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var node = tvConnections.GetNodeAt(tvConnections.PointToClient(Cursor.Position));
+            if (node == null || !(node.Tag is ConnectionProfile))
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            tvConnections.SelectedNode = node;
+        }
+
+        private void mnuCtxRename_Click(object sender, EventArgs e)
+        {
+            if (!(tvConnections.SelectedNode?.Tag is ConnectionProfile profile)) return;
+
+            using (var dlg = new RenamePromptForm("Rename Connection", "Connection Name:", profile.Name))
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+                var newName = dlg.Value;
+                if (string.IsNullOrEmpty(newName) || newName == profile.Name) return;
+
+                if (_connectionManager.Profiles.Any(p =>
+                        p != profile && p.Name.Equals(newName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageBox.Show("Nama connection sudah dipakai.", "Validasi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                bool wasActive = _activeConnectionName == profile.Name;
+                var oldName = profile.Name;
+                _connectionManager.RenameConnection(oldName, newName);
+
+                tvConnections.SelectedNode.Text = newName;
+
+                if (wasActive)
+                {
+                    _activeConnectionName = newName;
+                    SetStatus($"Active connection: {newName}", true);
+                }
+            }
+        }
+
+        private void mnuCtxDelete_Click(object sender, EventArgs e)
+        {
+            var node = tvConnections.SelectedNode;
+            if (!(node?.Tag is ConnectionProfile profile)) return;
+
+            var confirm = MessageBox.Show(
+                $"Hapus connection \"{profile.Name}\"?\nIni hanya menghapus profile connection dari aplikasi, database tidak terpengaruh.",
+                "Konfirmasi Hapus", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (confirm != DialogResult.Yes) return;
+
+            _connectionManager.RemoveConnection(profile.Name);
+            node.Remove();
+
+            if (_activeConnectionName == profile.Name)
+            {
+                _activeConnectionName = null;
+                SetStatus("Tidak ada connection aktif", false);
+            }
+        }
+
         // ============ MENU ============
 
         private void mnuDatabaseAddConnection_Click(object sender, EventArgs e)
@@ -251,7 +505,7 @@ namespace DynamoDBUI
                 if (form.ShowDialog(this) == DialogResult.OK && form.Result != null)
                 {
                     _connectionManager.AddConnection(form.Result);
-                    var node = new TreeNode(form.Result.Name) { Tag = form.Result };
+                    var node = CreateConnectionNode(form.Result);
                     tvConnections.Nodes.Add(node);
                     node.Expand();
                     RefreshTablesForNode(node);
@@ -267,9 +521,12 @@ namespace DynamoDBUI
                 return;
             }
 
-            var connectionNode = tvConnections.SelectedNode.Tag is ConnectionProfile
-                ? tvConnections.SelectedNode
-                : tvConnections.SelectedNode.Parent;
+            var connectionNode = FindAncestorConnectionNode(tvConnections.SelectedNode);
+            if (connectionNode == null)
+            {
+                MessageBox.Show("Pilih connection di sidebar dulu.");
+                return;
+            }
 
             RefreshTablesForNode(connectionNode);
         }

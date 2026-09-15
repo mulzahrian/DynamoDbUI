@@ -30,6 +30,23 @@ namespace DynamoDBUI.Services
             ConnectionStore.Save(Profiles);
         }
 
+        public bool RenameConnection(string oldName, string newName)
+        {
+            var profile = Profiles.Find(p => p.Name == oldName);
+            if (profile == null) return false;
+
+            profile.Name = newName;
+
+            if (_services.TryGetValue(oldName, out var service))
+            {
+                _services.Remove(oldName);
+                _services[newName] = service;
+            }
+
+            ConnectionStore.Save(Profiles);
+            return true;
+        }
+
         public DynamoDbService GetService(string connectionName)
         {
             if (_services.ContainsKey(connectionName))
