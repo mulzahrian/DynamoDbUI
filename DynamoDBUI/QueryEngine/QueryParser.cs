@@ -38,7 +38,7 @@ namespace DynamoDBUI.QueryEngine
 
         private static ParsedQuery ParseView(string query)
         {
-            var pattern = @"^VIEW\s+(?<table>\w+)" +
+            var pattern = @"^VIEW\s+(?<table>[\w.-]+)" +
                           @"(\s+FINDBY\s+(?<col>\w+)\s*=\s*(?<val>.+?))?" +
                           @"(\s+ORDER\s+BY\s+(?<ordercol>\w+)(\s+(?<dir>ASC|DESC))?)?$";
 
@@ -72,7 +72,7 @@ namespace DynamoDBUI.QueryEngine
 
         private static ParsedQuery ParseCreateTable(string query)
         {
-            var pattern = @"^CREATE\s+TABLE\s+(?<table>\w+)\s*\((?<cols>.+)\)$";
+            var pattern = @"^CREATE\s+TABLE\s+(?<table>[\w.-]+)\s*\((?<cols>.+)\)$";
             var m = Regex.Match(query, pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             if (!m.Success)
                 throw new QueryParseException(
@@ -105,7 +105,7 @@ namespace DynamoDBUI.QueryEngine
 
         private static ParsedQuery ParseInsert(string query)
         {
-            var pattern = @"^INSERT\s+INTO\s+(?<table>\w+)\s*\((?<cols>.+?)\)\s*VALUES\s*\((?<vals>.+)\)$";
+            var pattern = @"^INSERT\s+INTO\s+(?<table>[\w.-]+)\s*\((?<cols>.+?)\)\s*VALUES\s*\((?<vals>.+)\)$";
             var m = Regex.Match(query, pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             if (!m.Success)
                 throw new QueryParseException(
@@ -127,7 +127,7 @@ namespace DynamoDBUI.QueryEngine
 
         private static ParsedQuery ParseDropTable(string query)
         {
-            var pattern = @"^DROP\s+TABLE\s+(?<table>\w+)$";
+            var pattern = @"^DROP\s+TABLE\s+(?<table>[\w.-]+)$";
             var m = Regex.Match(query, pattern, RegexOptions.IgnoreCase);
             if (!m.Success)
                 throw new QueryParseException("Format DROP TABLE salah. Contoh: DROP TABLE Users");

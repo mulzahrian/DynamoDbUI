@@ -30,10 +30,10 @@ namespace DynamoDBUI.Forms
         {
             BackColor = DarkTheme.DialogBackground;
 
-            foreach (var lbl in new[] { lblName, lblAccessKey, lblSecretKey, lblRegion, lblServiceUrl })
+            foreach (var lbl in new[] { lblName, lblAccessKey, lblSecretKey, lblSessionToken, lblRegion, lblServiceUrl })
                 lbl.ForeColor = Color.Gainsboro;
 
-            foreach (var txt in new[] { txtName, txtAccessKey, txtSecretKey, txtRegion, txtServiceUrl })
+            foreach (var txt in new[] { txtName, txtAccessKey, txtSecretKey, txtSessionToken, txtRegion, txtServiceUrl })
             {
                 txt.BackColor = DarkTheme.InputBackground;
                 txt.ForeColor = Color.White;
@@ -65,6 +65,7 @@ namespace DynamoDBUI.Forms
                 Name = txtName.Text.Trim(),
                 AccessKey = txtAccessKey.Text.Trim(),
                 SecretKey = txtSecretKey.Text.Trim(),
+                SessionToken = txtSessionToken.Text.Trim(),
                 Region = txtRegion.Text.Trim(),
                 ServiceUrl = txtServiceUrl.Text.Trim()
             };
@@ -115,7 +116,7 @@ namespace DynamoDBUI.Forms
             _isTesting = busy;
             btnTest.Enabled = !busy;
             btnOk.Enabled = !busy;
-            foreach (var txt in new[] { txtName, txtAccessKey, txtSecretKey, txtRegion, txtServiceUrl })
+            foreach (var txt in new[] { txtName, txtAccessKey, txtSecretKey, txtSessionToken, txtRegion, txtServiceUrl })
                 txt.Enabled = !busy;
         }
 

@@ -21,9 +21,9 @@ namespace DynamoDBUI.Utils
         private static readonly Regex NumberLiteral = new Regex(
             @"(?<![\w.])\d+(\.\d+)?\b", RegexOptions.Compiled);
 
-        // Nama table = kata setelah VIEW / TABLE / INTO
+        // Nama table = kata setelah VIEW / TABLE / INTO (boleh mengandung . dan - sesuai aturan nama table DynamoDB)
         private static readonly Regex TableIdentifier = new Regex(
-            @"(?<=\b(VIEW|TABLE|INTO)\s+)\w+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            @"(?<=\b(VIEW|TABLE|INTO)\s+)[\w.-]+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static bool _isHighlighting;
 

@@ -27,16 +27,31 @@ namespace DynamoDBUI.Utils
             {
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 var parts = line.Split('|');
-                if (parts.Length != 5) continue;
 
-                list.Add(new ConnectionProfile
+                // Format lama (tanpa SessionToken) punya 5 kolom, format baru 6 kolom.
+                if (parts.Length == 5)
                 {
-                    Name = parts[0],
-                    AccessKey = parts[1],
-                    SecretKey = parts[2],
-                    Region = parts[3],
-                    ServiceUrl = parts[4]
-                });
+                    list.Add(new ConnectionProfile
+                    {
+                        Name = parts[0],
+                        AccessKey = parts[1],
+                        SecretKey = parts[2],
+                        Region = parts[3],
+                        ServiceUrl = parts[4]
+                    });
+                }
+                else if (parts.Length == 6)
+                {
+                    list.Add(new ConnectionProfile
+                    {
+                        Name = parts[0],
+                        AccessKey = parts[1],
+                        SecretKey = parts[2],
+                        SessionToken = parts[3],
+                        Region = parts[4],
+                        ServiceUrl = parts[5]
+                    });
+                }
             }
 
             return list;
@@ -50,7 +65,7 @@ namespace DynamoDBUI.Utils
             var lines = new List<string>();
             foreach (var c in connections)
             {
-                lines.Add($"{c.Name}|{c.AccessKey}|{c.SecretKey}|{c.Region}|{c.ServiceUrl}");
+                lines.Add($"{c.Name}|{c.AccessKey}|{c.SecretKey}|{c.SessionToken}|{c.Region}|{c.ServiceUrl}");
             }
 
             File.WriteAllLines(FilePath, lines);

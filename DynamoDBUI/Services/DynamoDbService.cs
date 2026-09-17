@@ -27,7 +27,9 @@ namespace DynamoDBUI.Services
 
         public void Connect()
         {
-            var credentials = new BasicAWSCredentials(_profile.AccessKey, _profile.SecretKey);
+            AWSCredentials credentials = string.IsNullOrEmpty(_profile.SessionToken)
+                ? (AWSCredentials)new BasicAWSCredentials(_profile.AccessKey, _profile.SecretKey)
+                : new SessionAWSCredentials(_profile.AccessKey, _profile.SecretKey, _profile.SessionToken);
 
             var config = new AmazonDynamoDBConfig
             {

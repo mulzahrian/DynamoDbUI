@@ -62,9 +62,23 @@ namespace DynamoDBUI.Utils
                     }
 
                     var av = item[col];
-                    if (dt.Columns[col].DataType == typeof(double) && av.N != null)
+
+                    // Attribute NULL DynamoDB (bukan "missing") -> selalu DBNull,
+                    // apapun tipe kolomnya.
+                    if (av.NULL == true)
                     {
-                        row[col] = double.Parse(av.N, System.Globalization.CultureInfo.InvariantCulture);
+                        row[col] = DBNull.Value;
+                        continue;
+                    }
+
+                    if (dt.Columns[col].DataType == typeof(double))
+                    {
+                        // Kolom di-set double karena row lain punya angka di sini,
+                        // tapi row ini ternyata bukan number (data schemaless yang
+                        // tipenya campuran antar item) -> DBNull daripada crash.
+                        row[col] = av.N != null
+                            ? (object)double.Parse(av.N, System.Globalization.CultureInfo.InvariantCulture)
+                            : DBNull.Value;
                     }
                     else
                     {
