@@ -32,6 +32,13 @@ namespace DynamoDBUI.Utils
         public static readonly Color CommitAccent = ColorTranslator.FromHtml("#2DD4BF");
         public static readonly Color UndoAccent = ColorTranslator.FromHtml("#C9D1D9");
 
+        // Dialog & status (form, popup, context menu)
+        public static readonly Color DialogBackground = ColorTranslator.FromHtml("#1B1E23");
+        public static readonly Color InputBackground = ColorTranslator.FromHtml("#262B32");
+        public static readonly Color InputBorder = ColorTranslator.FromHtml("#3A4048");
+        public static readonly Color DangerAccent = ColorTranslator.FromHtml("#FF5C5C");
+        public static readonly Color SuccessAccent = ColorTranslator.FromHtml("#2DD4BF");
+
         // Syntax highlight
         public static readonly Color KeywordStatement = ColorTranslator.FromHtml("#FF79C6"); // VIEW, CREATE, INSERT, DROP
         public static readonly Color KeywordClause = ColorTranslator.FromHtml("#569CD6");     // TABLE, ORDER, BY, FINDBY, dst

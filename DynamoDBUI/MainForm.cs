@@ -274,7 +274,7 @@ namespace DynamoDBUI
             // minimal harus ada 1 query tab yang terbuka
             if (tabQueries.TabPages.Count <= 1)
             {
-                MessageBox.Show("Minimal harus ada 1 query tab yang terbuka.");
+                ThemedMessageBox.Show(this, "Minimal harus ada 1 query tab yang terbuka.", "Info", ThemedMessageIcon.Info);
                 return;
             }
 
@@ -429,18 +429,29 @@ namespace DynamoDBUI
             }
         }
 
-        // ============ SIDEBAR CONTEXT MENU (rename/delete connection) ============
+        // ============ SIDEBAR CONTEXT MENU (rename/delete connection, delete table) ============
 
         private void ctxConnections_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             var node = tvConnections.GetNodeAt(tvConnections.PointToClient(Cursor.Position));
-            if (node == null || !(node.Tag is ConnectionProfile))
+            bool isConnection = node?.Tag is ConnectionProfile;
+            bool isTable = node?.Tag as string == "table";
+
+            if (node == null || (!isConnection && !isTable))
             {
                 e.Cancel = true;
                 return;
             }
 
             tvConnections.SelectedNode = node;
+
+            mnuCtxRename.Visible = isConnection;
+            mnuCtxDelete.Visible = isConnection;
+            mnuCtxSeparator.Visible = isConnection;
+            mnuCtxRefresh.Visible = isConnection;
+
+            mnuCtxDeleteTable.Visible = isTable;
+            mnuCtxRefreshColumns.Visible = isTable;
         }
 
         private void mnuCtxRename_Click(object sender, EventArgs e)
@@ -457,8 +468,7 @@ namespace DynamoDBUI
                 if (_connectionManager.Profiles.Any(p =>
                         p != profile && p.Name.Equals(newName, StringComparison.OrdinalIgnoreCase)))
                 {
-                    MessageBox.Show("Nama connection sudah dipakai.", "Validasi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    ThemedMessageBox.Show(this, "Nama connection sudah dipakai.", "Validasi", ThemedMessageIcon.Warning);
                     return;
                 }
 
@@ -481,9 +491,9 @@ namespace DynamoDBUI
             var node = tvConnections.SelectedNode;
             if (!(node?.Tag is ConnectionProfile profile)) return;
 
-            var confirm = MessageBox.Show(
+            var confirm = ThemedMessageBox.Show(this,
                 $"Hapus connection \"{profile.Name}\"?\nIni hanya menghapus profile connection dari aplikasi, database tidak terpengaruh.",
-                "Konfirmasi Hapus", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                "Konfirmasi Hapus", ThemedMessageIcon.Question, ThemedMessageButtons.YesNo);
             if (confirm != DialogResult.Yes) return;
 
             _connectionManager.RemoveConnection(profile.Name);
@@ -496,11 +506,46 @@ namespace DynamoDBUI
             }
         }
 
+        private void mnuCtxRefreshColumns_Click(object sender, EventArgs e)
+        {
+            var node = tvConnections.SelectedNode;
+            if (node?.Tag as string != "table") return;
+
+            LoadColumnsForNode(node);
+            node.Expand();
+        }
+
+        private async void mnuCtxDeleteTable_Click(object sender, EventArgs e)
+        {
+            var node = tvConnections.SelectedNode;
+            if (node?.Tag as string != "table") return;
+
+            var connectionNode = FindAncestorConnectionNode(node);
+            if (!(connectionNode?.Tag is ConnectionProfile profile)) return;
+
+            var confirm = ThemedMessageBox.Show(this,
+                $"Hapus table \"{node.Text}\"?\nSemua data di dalam table ini akan hilang secara permanen.",
+                "Konfirmasi Hapus Table", ThemedMessageIcon.Warning, ThemedMessageButtons.YesNo);
+            if (confirm != DialogResult.Yes) return;
+
+            try
+            {
+                var service = _connectionManager.GetService(profile.Name);
+                await service.DropTableAsync(node.Text);
+                node.Remove();
+                SetStatus($"Table \"{node.Text}\" berhasil dihapus.", true);
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show(this, "Gagal menghapus table: " + ex.Message, "Error", ThemedMessageIcon.Error);
+            }
+        }
+
         // ============ MENU ============
 
         private void mnuDatabaseAddConnection_Click(object sender, EventArgs e)
         {
-            using (var form = new AddConnectionForm())
+            using (var form = new AddConnectionForm(_connectionManager.Profiles.Select(p => p.Name)))
             {
                 if (form.ShowDialog(this) == DialogResult.OK && form.Result != null)
                 {
@@ -517,14 +562,14 @@ namespace DynamoDBUI
         {
             if (tvConnections.SelectedNode == null)
             {
-                MessageBox.Show("Pilih connection di sidebar dulu.");
+                ThemedMessageBox.Show(this, "Pilih connection di sidebar dulu.", "Info", ThemedMessageIcon.Info);
                 return;
             }
 
             var connectionNode = FindAncestorConnectionNode(tvConnections.SelectedNode);
             if (connectionNode == null)
             {
-                MessageBox.Show("Pilih connection di sidebar dulu.");
+                ThemedMessageBox.Show(this, "Pilih connection di sidebar dulu.", "Info", ThemedMessageIcon.Info);
                 return;
             }
 
@@ -542,12 +587,12 @@ namespace DynamoDBUI
 
         private void mnuHelpAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(
+            ThemedMessageBox.Show(this,
                 "DynamoDBUI\nIDE sederhana untuk DynamoDB Local.\n\n" +
                 "Query language:\nVIEW table [FINDBY col=val] [ORDER BY col ASC|DESC]\n" +
                 "CREATE TABLE table (col TYPE PK, col TYPE SK, ...)\n" +
                 "INSERT INTO table (col1,col2) VALUES (val1,val2)\nDROP TABLE table",
-                "About DynamoDBUI");
+                "About DynamoDBUI", ThemedMessageIcon.Info);
         }
 
         // ============ QUERY EXECUTION ============
@@ -556,8 +601,8 @@ namespace DynamoDBUI
         {
             if (string.IsNullOrEmpty(_activeConnectionName))
             {
-                MessageBox.Show("Pilih / connect ke database dulu di sidebar sebelah kiri.",
-                    "Belum ada connection aktif", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ThemedMessageBox.Show(this, "Pilih / connect ke database dulu di sidebar sebelah kiri.",
+                    "Belum ada connection aktif", ThemedMessageIcon.Warning);
                 return;
             }
 

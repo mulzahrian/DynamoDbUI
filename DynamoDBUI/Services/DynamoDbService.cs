@@ -32,7 +32,9 @@ namespace DynamoDBUI.Services
             var config = new AmazonDynamoDBConfig
             {
                 ServiceURL = _profile.ServiceUrl,
-                AuthenticationRegion = _profile.Region
+                AuthenticationRegion = _profile.Region,
+                Timeout = TimeSpan.FromSeconds(6),
+                MaxErrorRetry = 1
             };
 
             _client = new AmazonDynamoDBClient(credentials, config);

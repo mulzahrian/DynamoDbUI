@@ -36,6 +36,8 @@
             this.mnuCtxDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCtxSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.mnuCtxRefresh = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuCtxDeleteTable = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuCtxRefreshColumns = new System.Windows.Forms.ToolStripMenuItem();
 
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
@@ -103,16 +105,30 @@
             this.tvConnections.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvConnections_NodeMouseDoubleClick);
             this.tvConnections.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvConnections_BeforeExpand);
 
-            // ctxConnections (rename/delete connection)
+            // ctxConnections (rename/delete connection, delete table, refresh) - retheme dark + teal hover
             this.ctxConnections.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.mnuCtxRename, this.mnuCtxDelete, this.mnuCtxSeparator, this.mnuCtxRefresh });
+                this.mnuCtxRename, this.mnuCtxDelete, this.mnuCtxSeparator, this.mnuCtxRefresh,
+                this.mnuCtxDeleteTable, this.mnuCtxRefreshColumns });
+            this.ctxConnections.Renderer = new System.Windows.Forms.ToolStripProfessionalRenderer(new DynamoDBUI.Utils.AppColorTable());
+            this.ctxConnections.BackColor = DynamoDBUI.Utils.DarkTheme.PanelBackground;
+            this.ctxConnections.ForeColor = System.Drawing.Color.White;
+            this.ctxConnections.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.ctxConnections.Opening += new System.ComponentModel.CancelEventHandler(this.ctxConnections_Opening);
             this.mnuCtxRename.Text = "Rename Connection...";
+            this.mnuCtxRename.ForeColor = System.Drawing.Color.White;
             this.mnuCtxRename.Click += new System.EventHandler(this.mnuCtxRename_Click);
             this.mnuCtxDelete.Text = "Delete Connection";
+            this.mnuCtxDelete.ForeColor = DynamoDBUI.Utils.DarkTheme.DangerAccent;
             this.mnuCtxDelete.Click += new System.EventHandler(this.mnuCtxDelete_Click);
             this.mnuCtxRefresh.Text = "Refresh Tables";
+            this.mnuCtxRefresh.ForeColor = System.Drawing.Color.White;
             this.mnuCtxRefresh.Click += new System.EventHandler(this.mnuDatabaseRefreshTables_Click);
+            this.mnuCtxDeleteTable.Text = "Delete Table";
+            this.mnuCtxDeleteTable.ForeColor = DynamoDBUI.Utils.DarkTheme.DangerAccent;
+            this.mnuCtxDeleteTable.Click += new System.EventHandler(this.mnuCtxDeleteTable_Click);
+            this.mnuCtxRefreshColumns.Text = "Refresh Columns";
+            this.mnuCtxRefreshColumns.ForeColor = System.Drawing.Color.White;
+            this.mnuCtxRefreshColumns.Click += new System.EventHandler(this.mnuCtxRefreshColumns_Click);
 
             // tabQueries
             this.tabQueries.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -162,5 +178,7 @@
         private System.Windows.Forms.ToolStripMenuItem mnuCtxDelete;
         private System.Windows.Forms.ToolStripSeparator mnuCtxSeparator;
         private System.Windows.Forms.ToolStripMenuItem mnuCtxRefresh;
+        private System.Windows.Forms.ToolStripMenuItem mnuCtxDeleteTable;
+        private System.Windows.Forms.ToolStripMenuItem mnuCtxRefreshColumns;
     }
 }

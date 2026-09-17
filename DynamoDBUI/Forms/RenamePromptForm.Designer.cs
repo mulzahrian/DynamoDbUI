@@ -21,18 +21,28 @@
             this.lblPrompt.Text = "Name:";
             this.lblPrompt.Location = new System.Drawing.Point(15, 18);
             this.lblPrompt.Size = new System.Drawing.Size(280, 20);
+            this.lblPrompt.Font = new System.Drawing.Font("Segoe UI", 9F);
 
             this.txtValue.Location = new System.Drawing.Point(15, 42);
             this.txtValue.Size = new System.Drawing.Size(280, 22);
+            this.txtValue.Font = new System.Drawing.Font("Segoe UI", 9.5F);
 
             this.btnOk.Text = "OK";
             this.btnOk.Location = new System.Drawing.Point(130, 82);
             this.btnOk.Size = new System.Drawing.Size(80, 28);
+            this.btnOk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOk.FlatAppearance.BorderSize = 0;
+            this.btnOk.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnOk.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
 
             this.btnCancel.Text = "Cancel";
             this.btnCancel.Location = new System.Drawing.Point(215, 82);
             this.btnCancel.Size = new System.Drawing.Size(80, 28);
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.FlatAppearance.BorderSize = 0;
+            this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 
             this.AcceptButton = this.btnOk;
