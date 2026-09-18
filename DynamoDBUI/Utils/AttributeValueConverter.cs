@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Amazon.DynamoDBv2.Model;
 
 namespace DynamoDBUI.Utils
@@ -11,6 +12,11 @@ namespace DynamoDBUI.Utils
     /// </summary>
     public static class AttributeValueConverter
     {
+        // Pola angka valid untuk DynamoDB N (tanpa notasi ilmiah/pemisah ribuan),
+        // dicek lewat regex saja (bukan double.Parse) supaya digit besar
+        // (mis. ID berbasis timestamp 16+ digit) tidak kehilangan presisi.
+        private static readonly Regex NumericPattern = new Regex(@"^[+-]?\d+(\.\d+)?$", RegexOptions.Compiled);
+
         public static string ToDisplayString(AttributeValue av)
         {
             if (av == null) return string.Empty;
@@ -94,16 +100,20 @@ namespace DynamoDBUI.Utils
         /// <summary>
         /// Ubah string mentah dari query editor jadi AttributeValue,
         /// dengan inferensi tipe: angka -> N, selain itu -> S.
+        /// Dipakai untuk INSERT, di mana tipe kolom harus pasti (satu AttributeValue).
         /// </summary>
         public static AttributeValue InferAttributeValue(string rawValue)
         {
-            var value = CsvLineParser.TrimQuotes(rawValue.Trim());
+            string trimmedRaw = rawValue.Trim();
+            bool isQuoted = trimmedRaw.StartsWith("'") || trimmedRaw.StartsWith("\"");
+            var value = CsvLineParser.TrimQuotes(trimmedRaw);
 
-            if (double.TryParse(value, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out double num)
-                && !rawValue.Trim().StartsWith("'") && !rawValue.Trim().StartsWith("\""))
+            if (!isQuoted && NumericPattern.IsMatch(value))
             {
-                return new AttributeValue { N = num.ToString(System.Globalization.CultureInfo.InvariantCulture) };
+                // Simpan digit apa adanya (bukan hasil re-format double) supaya angka
+                // besar (mis. ID berbasis timestamp 16+ digit) tidak berubah jadi
+                // notasi ilmiah atau kehilangan presisi.
+                return new AttributeValue { N = value };
             }
 
             if (value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
@@ -113,6 +123,40 @@ namespace DynamoDBUI.Utils
             }
 
             return new AttributeValue { S = value };
+        }
+
+        /// <summary>
+        /// Sama seperti <see cref="InferAttributeValue"/>, tapi untuk FINDBY (filter).
+        /// DynamoDB itu schemaless, jadi kolom yang sama bisa saja disimpan sebagai
+        /// Number di satu item dan String di item lain (contoh umum: ID berbasis
+        /// timestamp yang terlihat seperti angka tapi sebenarnya disimpan sebagai
+        /// String). Kalau value tidak diberi tanda kutip dan terlihat seperti angka,
+        /// kembalikan KEDUA kandidat tipe (N dan S) supaya FINDBY tetap ketemu
+        /// walau tipe aslinya beda dari dugaan. Kalau user memberi tanda kutip
+        /// eksplisit (mis. FINDBY id = '123'), paksa String saja.
+        /// </summary>
+        public static List<AttributeValue> InferAttributeValueCandidates(string rawValue)
+        {
+            string trimmedRaw = rawValue.Trim();
+            bool isQuoted = trimmedRaw.StartsWith("'") || trimmedRaw.StartsWith("\"");
+            var value = CsvLineParser.TrimQuotes(trimmedRaw);
+
+            if (!isQuoted && value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                !isQuoted && value.Equals("false", StringComparison.OrdinalIgnoreCase))
+            {
+                return new List<AttributeValue> { new AttributeValue { BOOL = bool.Parse(value) } };
+            }
+
+            if (!isQuoted && NumericPattern.IsMatch(value))
+            {
+                return new List<AttributeValue>
+                {
+                    new AttributeValue { N = value },
+                    new AttributeValue { S = value }
+                };
+            }
+
+            return new List<AttributeValue> { new AttributeValue { S = value } };
         }
     }
 }

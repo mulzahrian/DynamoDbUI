@@ -100,12 +100,26 @@ namespace DynamoDBUI.Services
 
             if (!string.IsNullOrEmpty(filterColumn))
             {
-                request.FilterExpression = "#c = :v";
-                request.ExpressionAttributeNames = new Dictionary<string, string> { { "#c", filterColumn } };
-                request.ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                // Value angka tanpa tanda kutip itu ambigu di DynamoDB yang schemaless:
+                // kolomnya bisa saja disimpan sebagai Number ATAU String (contoh umum:
+                // ID berbasis timestamp). Cocokkan ke kedua kandidat tipe lewat OR
+                // supaya FINDBY tidak kosong gara-gara salah tebak tipe.
+                var candidates = Utils.AttributeValueConverter.InferAttributeValueCandidates(filterValue);
+
+                var values = new Dictionary<string, AttributeValue>();
+                var orParts = new List<string>();
+                for (int i = 0; i < candidates.Count; i++)
                 {
-                    { ":v", Utils.AttributeValueConverter.InferAttributeValue(filterValue) }
-                };
+                    string placeholder = $":v{i}";
+                    values[placeholder] = candidates[i];
+                    orParts.Add($"#c = {placeholder}");
+                }
+
+                request.FilterExpression = orParts.Count > 1
+                    ? "(" + string.Join(" OR ", orParts) + ")"
+                    : orParts[0];
+                request.ExpressionAttributeNames = new Dictionary<string, string> { { "#c", filterColumn } };
+                request.ExpressionAttributeValues = values;
             }
 
             var response = await _client.ScanAsync(request);

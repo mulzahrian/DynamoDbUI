@@ -56,7 +56,10 @@ namespace DynamoDBUI.QueryEngine
             if (m.Groups["col"].Success)
             {
                 pq.FindByColumn = m.Groups["col"].Value;
-                pq.FindByValue = CsvLineParser.TrimQuotes(m.Groups["val"].Value.Trim());
+                // Jangan strip tanda kutip di sini — biarkan tetap ada supaya
+                // AttributeValueConverter bisa tahu user memang minta tipe String
+                // secara eksplisit (mis. FINDBY id = '123').
+                pq.FindByValue = m.Groups["val"].Value.Trim();
             }
 
             if (m.Groups["ordercol"].Success)
