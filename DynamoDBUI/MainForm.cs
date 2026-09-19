@@ -608,9 +608,17 @@ namespace DynamoDBUI
 
             var service = _connectionManager.GetService(_activeConnectionName);
 
+            // Kalau user nge-block (select) sebagian teks di editor, jalankan hanya
+            // bagian yang di-select itu. Kalau tidak ada selection, jalankan seluruh
+            // isi editor seperti biasa. Ini yang memungkinkan banyak query
+            // (dipisah per baris/blok) ditulis dalam satu tab lalu dijalankan satu-satu.
+            string queryText = panel.Editor.SelectionLength > 0
+                ? panel.Editor.SelectedText
+                : panel.Editor.Text;
+
             try
             {
-                var parsed = QueryParser.Parse(panel.Editor.Text);
+                var parsed = QueryParser.Parse(queryText);
                 var result = await QueryExecutor.ExecuteAsync(parsed, service);
 
                 panel.ResultsGrid.DataSource = result.Data;
