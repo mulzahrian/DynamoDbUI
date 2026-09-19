@@ -1,40 +1,118 @@
+## Visual Studio / .NET .gitignore
+## Based on https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Ll]og/
+[Ll]ogs/
+
+# Build results on 'Bin'/'Obj' directories (project-relative)
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+*.trx
+
+# Files built by Visual Studio
+*.ilk
+*.meta
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Publish / ClickOnce
+publish/
+*.[Pp]ublish.xml
+*.azurePubxml
+*.pubxml
+*.publishproj
+PublishScripts/
+
+# Others
+ClientBin/
+~$*
+*~
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
+
+# Backup & report files from converting an old project file
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
 
 # Office temporary files
-~$*
-
-# Access database lock files (laccdb, ldb)
 *.[lL][aA][cC][cC][dD][bB]
 *.[lL][dD][bB]
-
-# The following sections constitute a list of Office file extensions that support VBA.
-# If you want to exclude Office files from your repo, uncomment the corresponding file extensions.
-
-# Excel (xls, xlsb, xlsm, xlt, xltm, xla, xlam)
-#*.[xX][lL][sS]
-#*.[xX][lL][sS][bB]
-#*.[xX][lL][sS][mM]
-#*.[xX][lL][tT]
-#*.[xX][lL][tT][mM]
-#*.[xX][lL][aA]
-#*.[xX][lL][aA][mM]
-
-# Word (doc, docm, dot, dotm)
-#*.[dD][oO][cC]
-#*.[dD][oO][cC][mM]
-#*.[dD][oO][tT]
-#*.[dD][oO][tT][mM]
-
-# Access (accda, accdb, accde, mdb, mde)
-#*.[aA][cC][cC][dD][aA]
-#*.[aA][cC][cC][dD][bB]
-#*.[aA][cC][cC][dD][eE]
-#*.[mM][dD][bB]
-#*.[mM][dD][eE]
-
-# PowerPoint (ppt, pptm, pot, potm, pps, ppsm)
-#*.[pP][pP][tT]
-#*.[pP][pP][tT][mM]
-#*.[pP][oO][tT]
-#*.[pP][oO][tT][mM]
-#*.[pP][pP][sS]
-#*.[pP][pP][sS][mM]
